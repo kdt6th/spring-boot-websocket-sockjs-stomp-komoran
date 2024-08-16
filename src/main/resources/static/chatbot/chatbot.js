@@ -45,13 +45,26 @@ function showMessage(tag){
 	$("#chat-content").scrollTop($("#chat-content").prop("scrollHeight"));
 }
 
+function generateUUID() {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+    var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+    return v.toString(16);
+  });
+}
+function generateUniqueKey(){
+	//숫자를 36진법 문자열로 변환:36진법은 0-9와 a-z를 사용합니다 (총 36개 문자)
+	//console.log("random:",Math.random().toString(36));
+	return new Date().getTime().toString(36)+Math.random().toString(36).substring(2);//0.
+}
+
 //웹소켓 연결 후 인사말 출력
 function connect() {
 	client = Stomp.over(new SockJS('/ws-green-bot'));
 	client.connect({}, (frame) => {
-		key = new Date().getTime();
+		key = generateUniqueKey();
 		//console.log(frame)
-		//구독설정
+		
+		//메시지 수신을위한 구독설정
 		client.subscribe(`/topic/bot/${key}`, (answer) => {
 			var msgObj = answer.body;
 			//console.log("msg:", msgObj);
@@ -127,14 +140,32 @@ function btnMsgSendClicked(){
 		//clearQuestion();
 		return;
 	}
+	var now = new Date();
+	var time = formatTime(now);
+	var tag = `
+				<div class="msg user flex">
+					
+					<div class="message">
+						<div class="part">
+							<p>${question}</p>
+						</div>
+						<div class="time">${time}</div>
+					</div>
+				</div>
+				`;
+	
+	showMessage(tag);
+	
+	
 	var data={
 			key: key,
 			content: question,
 			name: "guest" //principle.getName 이름의 값으로 넣으면 될 듯..?
 		}
-		//접속하자마자 연결시도
-		client.send("/bot/question",{},JSON.stringify(data));
-		clearQuestion()
+	
+	client.send("/bot/question",{},JSON.stringify(data));
+	clearQuestion()
+	
 }
 
 $(function() {

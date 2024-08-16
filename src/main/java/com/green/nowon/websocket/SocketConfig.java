@@ -24,7 +24,7 @@ public class SocketConfig implements WebSocketMessageBrokerConfigurer {
 		//사용자->서버에 메시지보낼때 전송할때 접두사
 		registry.setApplicationDestinationPrefixes("/bot");
 		
-		registry.enableSimpleBroker("/topic"); //서버 클라이언트한테 보낼때
+		//registry.enableSimpleBroker("/topic"); //서버 클라이언트한테 보낼때
 	}
 
 	
